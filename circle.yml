@@ -188,19 +188,13 @@ jobs:
             # DISPLAY=:0 ./logbt -- xvfb-run --server-args="-screen 0 1024x768x24" \
             DISPLAY=:0 xvfb-run --server-args="-screen 0 1024x768x24" \
               $(scripts/mason.sh PREFIX apitrace VERSION 6a30de1)/bin/apitrace trace --api=egl -v make test-node
-#      - run:
-#          name: Publish render-test results
-#          command: |
-#            ./platform/node/scripts/after_script.sh ${CIRCLE_BUILD_NUM}
+      - store_artifacts:
+          path: mapbox-gl-js/test/integration/render-tests/index.html
+          destination: render-tests
 #      - run:
 #          name: Post-success commands
 #          command: |
 #            ./platform/node/scripts/after_success.sh
-#      - run:
-#          name: Post-failures commands
-#          when: on_fail
-#          command: |
-#            aws s3 cp . s3://mapbox/mapbox-gl-native/render-tests/${CIRCLE_BUILD_NUM} --recursive --exclude "*" --include "*.trace"
 
 
 # ------------------------------------------------------------------------------
@@ -229,19 +223,13 @@ jobs:
             # DISPLAY=:0 ./logbt -- xvfb-run --server-args="-screen 0 1024x768x24" \
             DISPLAY=:0 xvfb-run --server-args="-screen 0 1024x768x24" \
               $(scripts/mason.sh PREFIX apitrace VERSION 6a30de1)/bin/apitrace trace --api=egl -v make test-node
-#      - run:
-#          name: Publish render-test results
-#          command: |
-#            ./platform/node/scripts/after_script.sh ${CIRCLE_BUILD_NUM}
+      - store_artifacts:
+          path: mapbox-gl-js/test/integration/render-tests/index.html
+          destination: render-tests
 #      - run:
 #          name: Post-success commands
 #          command: |
 #            ./platform/node/scripts/after_success.sh
-#      - run:
-#          name: Post-failures commands
-#          when: on_fail
-#          command: |
-#            aws s3 cp . s3://mapbox/mapbox-gl-native/render-tests/${CIRCLE_BUILD_NUM} --recursive --exclude "*" --include "*.trace"
 
 # ------------------------------------------------------------------------------
   node6-clang39-debug:
@@ -269,19 +257,13 @@ jobs:
             # DISPLAY=:0 ./logbt -- xvfb-run --server-args="-screen 0 1024x768x24" \
             DISPLAY=:0 xvfb-run --server-args="-screen 0 1024x768x24" \
               $(scripts/mason.sh PREFIX apitrace VERSION 6a30de1)/bin/apitrace trace --api=egl -v make test-node
-#      - run:
-#          name: Publish render-test results
-#          command: |
-#            ./platform/node/scripts/after_script.sh ${CIRCLE_BUILD_NUM}
+      - store_artifacts:
+          path: mapbox-gl-js/test/integration/render-tests/index.html
+          destination: render-tests
 #      - run:
 #          name: Post-success commands
 #          command: |
 #            ./platform/node/scripts/after_success.sh
-#      - run:
-#          name: Post-failures commands
-#          when: on_fail
-#          command: |
-#            aws s3 cp . s3://mapbox/mapbox-gl-native/render-tests/${CIRCLE_BUILD_NUM} --recursive --exclude "*" --include "*.trace"
 
 # ------------------------------------------------------------------------------
   linux-clang39-debug:
