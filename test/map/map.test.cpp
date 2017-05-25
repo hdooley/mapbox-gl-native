@@ -298,7 +298,8 @@ TEST(Map, StyleLoadedSignal) {
 // Test for https://github.com/mapbox/mapbox-gl-native/issues/7902
 TEST(Map, TEST_REQUIRES_SERVER(StyleNetworkErrorRetry)) {
     MapTest test;
-    OnlineFileSource fileSource;
+    ThreadPool threadPool {4};
+    OnlineFileSource fileSource {threadPool};
 
     Map map(test.backend, test.view.getSize(), 1, fileSource, test.threadPool, MapMode::Still);
     map.setStyleURL("http://127.0.0.1:3000/style-fail-once-500");
@@ -312,7 +313,8 @@ TEST(Map, TEST_REQUIRES_SERVER(StyleNetworkErrorRetry)) {
 
 TEST(Map, TEST_REQUIRES_SERVER(StyleNotFound)) {
     MapTest test;
-    OnlineFileSource fileSource;
+    ThreadPool threadPool {4};
+    OnlineFileSource fileSource {threadPool};
 
     Map map(test.backend, test.view.getSize(), 1, fileSource, test.threadPool, MapMode::Still);
     map.setStyleURL("http://127.0.0.1:3000/style-fail-once-404");

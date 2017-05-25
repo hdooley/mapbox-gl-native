@@ -5,6 +5,7 @@
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/timer.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/util/default_thread_pool.hpp>
 
 #include <gtest/gtest.h>
 
@@ -12,7 +13,8 @@ using namespace mbgl;
 
 TEST(OnlineFileSource, Cancel) {
     util::RunLoop loop;
-    OnlineFileSource fs;
+    ThreadPool threadPool {4};
+    OnlineFileSource fs {threadPool};
 
     fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, [&](Response) {
         ADD_FAILURE() << "Callback should not be called";
@@ -23,7 +25,8 @@ TEST(OnlineFileSource, Cancel) {
 
 TEST(OnlineFileSource, TEST_REQUIRES_SERVER(CancelMultiple)) {
     util::RunLoop loop;
-    OnlineFileSource fs;
+    ThreadPool threadPool {4};
+    OnlineFileSource fs {threadPool};
 
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/test" };
 
@@ -47,7 +50,8 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(CancelMultiple)) {
 
 TEST(OnlineFileSource, TEST_REQUIRES_SERVER(TemporaryError)) {
     util::RunLoop loop;
-    OnlineFileSource fs;
+    ThreadPool threadPool {4};
+    OnlineFileSource fs {threadPool};
 
     const auto start = Clock::now();
 
@@ -85,7 +89,8 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(TemporaryError)) {
 
 TEST(OnlineFileSource, TEST_REQUIRES_SERVER(ConnectionError)) {
     util::RunLoop loop;
-    OnlineFileSource fs;
+    ThreadPool threadPool {4};
+    OnlineFileSource fs {threadPool};
 
     const auto start = Clock::now();
 
@@ -115,7 +120,8 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(ConnectionError)) {
 
 TEST(OnlineFileSource, TEST_REQUIRES_SERVER(Timeout)) {
     util::RunLoop loop;
-    OnlineFileSource fs;
+    ThreadPool threadPool {4};
+    OnlineFileSource fs {threadPool};
 
     int counter = 0;
 
@@ -141,7 +147,8 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(Timeout)) {
 
 TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RetryDelayOnExpiredTile)) {
     util::RunLoop loop;
-    OnlineFileSource fs;
+    ThreadPool threadPool {4};
+    OnlineFileSource fs {threadPool};
 
     int counter = 0;
 
@@ -164,7 +171,8 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RetryDelayOnExpiredTile)) {
 
 TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RetryOnClockSkew)) {
     util::RunLoop loop;
-    OnlineFileSource fs;
+    ThreadPool threadPool {4};
+    OnlineFileSource fs {threadPool};
 
     int counter = 0;
 
@@ -192,7 +200,8 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RetryOnClockSkew)) {
 
 TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RespectPriorExpires)) {
     util::RunLoop loop;
-    OnlineFileSource fs;
+    ThreadPool threadPool {4};
+    OnlineFileSource fs {threadPool};
 
     // Very long expiration time, should never arrive.
     Resource resource1{ Resource::Unknown, "http://127.0.0.1:3000/test" };
@@ -222,7 +231,8 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RespectPriorExpires)) {
 
 TEST(OnlineFileSource, TEST_REQUIRES_SERVER(Load)) {
     util::RunLoop loop;
-    OnlineFileSource fs;
+    ThreadPool threadPool {4};
+    OnlineFileSource fs {threadPool};
 
     const int concurrency = 50;
     const int max = 10000;
@@ -266,7 +276,8 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(Load)) {
 
 TEST(OnlineFileSource, TEST_REQUIRES_SERVER(NetworkStatusChange)) {
     util::RunLoop loop;
-    OnlineFileSource fs;
+    ThreadPool threadPool {4};
+    OnlineFileSource fs {threadPool};
 
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/delayed" };
 
@@ -295,7 +306,8 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(NetworkStatusChange)) {
 // reachability issues.
 TEST(OnlineFileSource, TEST_REQUIRES_SERVER(NetworkStatusChangePreempt)) {
     util::RunLoop loop;
-    OnlineFileSource fs;
+    ThreadPool threadPool {4};
+    OnlineFileSource fs {threadPool};
 
     const auto start = Clock::now();
 
@@ -335,7 +347,8 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(NetworkStatusChangePreempt)) {
 
 TEST(OnlineFileSource, TEST_REQUIRES_SERVER(NetworkStatusOnlineOffline)) {
     util::RunLoop loop;
-    OnlineFileSource fs;
+    ThreadPool threadPool {4};
+    OnlineFileSource fs {threadPool};
 
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/test" };
 
@@ -363,7 +376,8 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(NetworkStatusOnlineOffline)) {
 
 TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RateLimitStandard)) {
     util::RunLoop loop;
-    OnlineFileSource fs;
+    ThreadPool threadPool {4};
+    OnlineFileSource fs {threadPool};
 
     auto req = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/rate-limit?std=true" }, [&](Response res) {
         ASSERT_NE(nullptr, res.error);
@@ -378,7 +392,8 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RateLimitStandard)) {
 
 TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RateLimitMBX)) {
     util::RunLoop loop;
-    OnlineFileSource fs;
+    ThreadPool threadPool {4};
+    OnlineFileSource fs {threadPool};
 
     auto req = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/rate-limit?mbx=true" }, [&](Response res) {
         ASSERT_NE(nullptr, res.error);
@@ -393,7 +408,8 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RateLimitMBX)) {
 
 TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RateLimitDefault)) {
     util::RunLoop loop;
-    OnlineFileSource fs;
+    ThreadPool threadPool {4};
+    OnlineFileSource fs {threadPool};
 
     auto req = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/rate-limit" }, [&](Response res) {
         ASSERT_NE(nullptr, res.error);
@@ -407,7 +423,8 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RateLimitDefault)) {
 
 TEST(OnlineFileSource, ChangeAPIBaseURL){
     util::RunLoop loop;
-    OnlineFileSource fs;
+    ThreadPool threadPool {4};
+    OnlineFileSource fs {threadPool};
 
     EXPECT_EQ(mbgl::util::API_BASE_URL, fs.getAPIBaseURL());
     const std::string customURL = "test.domain";

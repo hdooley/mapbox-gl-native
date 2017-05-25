@@ -26,8 +26,9 @@ namespace mbgl {
 
 class DefaultFileSource::Impl {
 public:
-    Impl(const std::string& cachePath, uint64_t maximumCacheSize)
-        : offlineDatabase(cachePath, maximumCacheSize) {
+    Impl(Scheduler& scheduler, const std::string& cachePath, uint64_t maximumCacheSize)
+        : offlineDatabase(cachePath, maximumCacheSize)
+        , onlineFileSource(scheduler) {
     }
 
     void setAPIBaseURL(const std::string& url) {
@@ -171,12 +172,14 @@ DefaultFileSource::DefaultFileSource(Scheduler& scheduler,
     : DefaultFileSource(scheduler, cachePath, std::make_unique<AssetFileSource>(scheduler, assetRoot), maximumCacheSize) {
 }
 
-DefaultFileSource::DefaultFileSource(Scheduler&,
+DefaultFileSource::DefaultFileSource(Scheduler& scheduler,
                                      const std::string& cachePath,
                                      std::unique_ptr<FileSource>&& assetFileSource_,
                                      uint64_t maximumCacheSize)
     : thread(std::make_unique<util::Thread<Impl>>(util::ThreadContext{"DefaultFileSource", util::ThreadPriority::Low},
-            cachePath, maximumCacheSize)),
+                                                  scheduler,
+                                                  cachePath,
+                                                  maximumCacheSize)),
       assetFileSource(std::move(assetFileSource_)),
       localFileSource(std::make_unique<LocalFileSource>()) {
 }

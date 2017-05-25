@@ -14,6 +14,7 @@
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/timer.hpp>
 #include <mbgl/util/http_timeout.hpp>
+#include <mbgl/actor/scheduler.hpp>
 
 #include <algorithm>
 #include <cassert>
@@ -178,7 +179,7 @@ private:
     util::AsyncTask reachability { std::bind(&Impl::networkIsReachableAgain, this) };
 };
 
-OnlineFileSource::OnlineFileSource()
+OnlineFileSource::OnlineFileSource(Scheduler&)
     : impl(std::make_unique<Impl>()) {
 }
 

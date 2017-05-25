@@ -5,9 +5,11 @@
 
 namespace mbgl {
 
+class Scheduler;
+
 class OnlineFileSource : public FileSource {
 public:
-    OnlineFileSource();
+    OnlineFileSource(Scheduler&);
     ~OnlineFileSource() override;
 
     void setAPIBaseURL(const std::string& t) { apiBaseURL = t; }
