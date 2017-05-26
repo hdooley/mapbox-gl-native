@@ -1,6 +1,9 @@
 # Do not edit. Regenerate this with ./scripts/generate-core-files.sh
 
 set(MBGL_CORE_FILES
+
+		
+
     # actor
     include/mbgl/actor/mailbox.hpp
     include/mbgl/actor/scheduler.hpp

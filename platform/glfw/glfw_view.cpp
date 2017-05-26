@@ -20,6 +20,9 @@
 #include <cassert>
 #include <cstdlib>
 
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw_gl3.h"
+
 void glfwError(int error, const char *description) {
     mbgl::Log::Error(mbgl::Event::OpenGL, "GLFW error (%i): %s", error, description);
     assert(false);
@@ -64,6 +67,9 @@ GLFWView::GLFWView(bool fullscreen_, bool benchmark_)
     glfwWindowHint(GLFW_DEPTH_BITS, 16);
 
     window = glfwCreateWindow(width, height, "Mapbox GL", monitor, nullptr);
+
+    ImGui_ImplGlfwGL3_Init(window, true);
+
     if (!window) {
         glfwTerminate();
         mbgl::Log::Error(mbgl::Event::OpenGL, "failed to initialize window");
@@ -449,9 +455,28 @@ void GLFWView::run() {
             const double started = glfwGetTime();
 
             activate();
+        ImGui_ImplGlfwGL3_NewFrame();
             mbgl::BackendScope scope { *this, mbgl::BackendScope::ScopeType::Implicit };
 
             map->render(*this);
+
+    bool show_test_window = true;
+    bool show_another_window = false;
+    ImVec4 clear_color = ImColor(114, 144, 154);
+
+		        // 1. Show a simple window
+		        // Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets appears in a window automatically called "Debug"
+		        {
+		            static float f = 0.0f;
+		            ImGui::Text("Hello, world!");
+		            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
+		            ImGui::ColorEdit3("clear color", (float*)&clear_color);
+		            if (ImGui::Button("Test Window")) show_test_window ^= 1;
+		            if (ImGui::Button("Another Window")) show_another_window ^= 1;
+		            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		        }
+
+						ImGui::Render();
 
             glfwSwapBuffers(window);
 

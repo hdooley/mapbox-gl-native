@@ -1,3 +1,14 @@
+node/
+cmake_install.cmake
+mbgl-glfw
+cmake-build-debug/
+CMakeFiles/
+libmbgl*
+
+CMakeCache.txt
+ca-bundle*
+
+.idea/
 .DS_Store
 .transifexrc
 *.pyc

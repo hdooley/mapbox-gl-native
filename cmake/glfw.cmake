@@ -9,6 +9,20 @@ target_sources(mbgl-glfw
     PRIVATE platform/glfw/settings_json.cpp
     PRIVATE platform/default/mbgl/util/default_styles.hpp
     PRIVATE platform/default/mbgl/util/default_styles.cpp
+
+		PRIVATE platform/glfw/imgui/imgui_draw.cpp
+		PRIVATE platform/glfw/imgui/imgui_demo.cpp
+		PRIVATE platform/glfw/imgui/imgui_impl_glfw_gl3.cpp
+		PRIVATE platform/glfw/imgui/imgui.cpp
+		# PRIVATE platform/glfw/imgui/extra_fonts/binary_to_compressed_c.cpp
+
+		PRIVATE platform/glfw/imgui/imgui_impl_glfw_gl3.h
+		PRIVATE platform/glfw/imgui/imconfig.h
+		PRIVATE platform/glfw/imgui/stb_rect_pack.h
+		PRIVATE platform/glfw/imgui/imgui_internal.h
+		PRIVATE platform/glfw/imgui/imgui.h
+		PRIVATE platform/glfw/imgui/stb_textedit.h
+		PRIVATE platform/glfw/imgui/stb_truetype.h
 )
 
 # Our GL implementation is internal to mbgl-core, which causes the GL header to
@@ -21,6 +35,7 @@ target_sources(mbgl-glfw
 # -isystem, or completely suppressing errors. Until the former solution is not
 # available, we'll suppress the errors from that definition file.
 set_source_files_properties(platform/glfw/glfw_view.cpp PROPERTIES COMPILE_FLAGS -Wno-error)
+set_source_files_properties(platform/glfw/imgui/imgui_impl_glfw_gl3.cpp PROPERTIES COMPILE_FLAGS -Wno-error)
 
 target_compile_options(mbgl-glfw
     PRIVATE -fvisibility-inlines-hidden
