@@ -7,6 +7,7 @@ workflows:
       - clang-tidy
       - android-debug-arm-v7
       - android-release-all
+      - node4-clang39-release-machine
       - node4-clang39-release
       - node6-clang39-release
       - node6-clang39-debug
@@ -192,6 +193,28 @@ jobs:
             - /root/.ccache
 
 # ------------------------------------------------------------------------------
+  node4-clang39-release-machine:
+    machine: true
+    working_directory: /home/circleci
+    steps:
+      - run:
+          name: Download docker image
+          command: sudo docker pull mbgl/ci:r3-linux-clang-3.9-node-4
+      - run:
+          name: Run docker container
+          command: |
+            sudo docker run -it --rm --privileged mbgl/ci:r3-linux-clang-3.9-node-4 \
+              bash -c "git remote update \
+                && git checkout ${CIRCLE_BRANCH} \
+                && git submodule update \
+                && WITH_EGL=1 make node \
+                && source scripts/circle_setup.sh \
+                && mapbox_install_logbt \
+                && mapbox_install_apitrace \
+                && mapbox_export_mesa_library_path \
+                && DISPLAY=:0 xvfb-run --server-args='-screen 0 1024x768x24' \
+                  ./logbt -- apitrace trace --api=egl -v make test-node"
+
   node4-clang39-release:
     docker:
       - image: mbgl/ci:r3-linux-clang-3.9-node-4
@@ -202,7 +225,7 @@ jobs:
       BUILDTYPE: Release
       WITH_EGL: 1
       PACKAGE_JSON_VERSION: $(node -e "console.log(require('./package.json').version)")
-      PUBLISH: $("${CIRCLE_BRANCH}" == "node-v${PACKAGE_JSON_VERSION}" ]] && echo true)
+      PUBLISH: $([[ "${CIRCLE_BRANCH}" == "node-v${PACKAGE_JSON_VERSION}" ]] && echo true)
     steps:
       - checkout
       - restore_cache:
@@ -217,11 +240,14 @@ jobs:
           name: Run node tests
           command: |
             source scripts/circle_setup.sh
-            #mapbox_install_logbt
+            mapbox_install_apitrace
             mapbox_export_mesa_library_path
-            # DISPLAY=:0 ./logbt -- xvfb-run --server-args="-screen 0 1024x768x24" \
             DISPLAY=:0 xvfb-run --server-args="-screen 0 1024x768x24" \
-              $(scripts/mason.sh PREFIX apitrace VERSION 6a30de1)/bin/apitrace trace --api=egl -v make test-node
+              apitrace trace --api=egl -v make test-node
+      - run:
+          name: Publish node package
+          when: on_success
+          command: platform/node/scripts/after_success.sh
       - save_cache:
           key: v1-node4-clang39-release
           paths:
@@ -230,13 +256,31 @@ jobs:
       - store_artifacts:
           path: mapbox-gl-js/test/integration/render-tests/index.html
           destination: render-tests
-#      - run:
-#          name: Post-success commands
-#          command: |
-#            ./platform/node/scripts/after_success.sh
 
 
 # ------------------------------------------------------------------------------
+  node6-clang39-release-machine:
+    machine: true
+    working_directory: /home/circleci
+    steps:
+      - run:
+          name: Download docker image
+          command: sudo docker pull mbgl/ci:r3-linux-clang-3.9
+      - run:
+          name: Run docker container
+          command: |
+            sudo docker run -it --rm --privileged mbgl/ci:r3-linux-clang-3.9 \
+              bash -c "git remote update \
+                && git checkout ${CIRCLE_BRANCH} \
+                && git submodule update \
+                && BUILDTYPE=Release WITH_EGL=1 make node \
+                && source scripts/circle_setup.sh \
+                && mapbox_install_logbt \
+                && mapbox_install_apitrace \
+                && mapbox_export_mesa_library_path \
+                && DISPLAY=:0 xvfb-run --server-args='-screen 0 1024x768x24' \
+                  ./logbt -- apitrace trace --api=egl -v make test-node"
+
   node6-clang39-release:
     docker:
       - image: mbgl/ci:r3-linux-clang-3.9
@@ -247,7 +291,7 @@ jobs:
       BUILDTYPE: Release
       WITH_EGL: 1
       PACKAGE_JSON_VERSION: $(node -e "console.log(require('./package.json').version)")
-      PUBLISH: $("${CIRCLE_BRANCH}" == "node-v${PACKAGE_JSON_VERSION}" ]] && echo true)
+      PUBLISH: $([[ "${CIRCLE_BRANCH}" == "node-v${PACKAGE_JSON_VERSION}" ]] && echo true)
     steps:
       - checkout
       - restore_cache:
@@ -262,11 +306,14 @@ jobs:
           name: Run node tests
           command: |
             source scripts/circle_setup.sh
-            #mapbox_install_logbt
+            mapbox_install_apitrace
             mapbox_export_mesa_library_path
-            # DISPLAY=:0 ./logbt -- xvfb-run --server-args="-screen 0 1024x768x24" \
             DISPLAY=:0 xvfb-run --server-args="-screen 0 1024x768x24" \
-              $(scripts/mason.sh PREFIX apitrace VERSION 6a30de1)/bin/apitrace trace --api=egl -v make test-node
+              apitrace trace --api=egl -v make test-node
+      - run:
+          name: Publish node package
+          when: on_success
+          command: platform/node/scripts/after_success.sh
       - save_cache:
           key: v1-node6-clang39-release
           paths:
@@ -275,12 +322,30 @@ jobs:
       - store_artifacts:
           path: mapbox-gl-js/test/integration/render-tests/index.html
           destination: render-tests
-#      - run:
-#          name: Post-success commands
-#          command: |
-#            ./platform/node/scripts/after_success.sh
 
 # ------------------------------------------------------------------------------
+  node6-clang39-debug-machine:
+    machine: true
+    working_directory: /home/circleci
+    steps:
+      - run:
+          name: Download docker image
+          command: sudo docker pull mbgl/ci:r3-linux-clang-3.9
+      - run:
+          name: Run docker container
+          command: |
+            sudo docker run -it --rm --privileged mbgl/ci:r3-linux-clang-3.9 \
+              bash -c "git remote update \
+                && git checkout ${CIRCLE_BRANCH} \
+                && git submodule update \
+                && BUILDTYPE=Debug WITH_EGL=1 make node \
+                && source scripts/circle_setup.sh \
+                && mapbox_install_logbt \
+                && mapbox_install_apitrace \
+                && mapbox_export_mesa_library_path \
+                && DISPLAY=:0 xvfb-run --server-args='-screen 0 1024x768x24' \
+                  ./logbt -- apitrace trace --api=egl -v make test-node"
+
   node6-clang39-debug:
     docker:
       - image: mbgl/ci:r3-linux-clang-3.9
@@ -291,7 +356,7 @@ jobs:
       BUILDTYPE: Debug
       WITH_EGL: 1
       PACKAGE_JSON_VERSION: $(node -e "console.log(require('./package.json').version)")
-      PUBLISH: $("${CIRCLE_BRANCH}" == "node-v${PACKAGE_JSON_VERSION}" ]] && echo true)
+      PUBLISH: $([[ "${CIRCLE_BRANCH}" == "node-v${PACKAGE_JSON_VERSION}" ]] && echo true)
     steps:
       - checkout
       - restore_cache:
@@ -306,11 +371,14 @@ jobs:
           name: Run node tests
           command: |
             source scripts/circle_setup.sh
-            #mapbox_install_logbt
+            mapbox_install_apitrace
             mapbox_export_mesa_library_path
-            # DISPLAY=:0 ./logbt -- xvfb-run --server-args="-screen 0 1024x768x24" \
             DISPLAY=:0 xvfb-run --server-args="-screen 0 1024x768x24" \
-              $(scripts/mason.sh PREFIX apitrace VERSION 6a30de1)/bin/apitrace trace --api=egl -v make test-node
+              apitrace trace --api=egl -v make test-node
+      - run:
+          name: Publish node package
+          when: on_success
+          command: platform/node/scripts/after_success.sh
       - save_cache:
           key: v1-node6-clang39-debug
           paths:
@@ -319,10 +387,6 @@ jobs:
       - store_artifacts:
           path: mapbox-gl-js/test/integration/render-tests/index.html
           destination: render-tests
-#      - run:
-#          name: Post-success commands
-#          command: |
-#            ./platform/node/scripts/after_success.sh
 
 # ------------------------------------------------------------------------------
   linux-clang39-debug:

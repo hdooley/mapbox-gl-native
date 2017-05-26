@@ -13,6 +13,12 @@ function mapbox_install_logbt {
 
 export -f mapbox_install_logbt
 
+function mapbox_install_apitrace {
+    export PATH=$(scripts/mason.sh PREFIX apitrace VERSION 6a30de1)/bin:${PATH}
+}
+
+export -f mapbox_install_apitrace
+
 function mapbox_export_mesa_library_path {
     # Install and set up to load a more recent version of mesa
     MESA_PREFIX=$(scripts/mason.sh PREFIX mesa VERSION 13.0.4)

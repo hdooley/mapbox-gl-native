@@ -21,4 +21,8 @@ lcov \
     --base-directory "build/linux-x86_64/${BUILDTYPE}" \
     --output-file "build/linux-x86_64/${BUILDTYPE}/coverage.info"
 
-coveralls-lcov "build/linux-x86_64/${BUILDTYPE}/coverage.info"
+coveralls-lcov \
+    --service-name="${COVERALLS_SERVICE_NAME}" \
+    --repo-token="${COVERALLS_REPO_TOKEN}" \
+    --service-job-id="${CIRCLE_BUILD_NUM}" \
+    "build/linux-x86_64/${BUILDTYPE}/coverage.info"
